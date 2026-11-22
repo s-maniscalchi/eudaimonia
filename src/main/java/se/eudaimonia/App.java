@@ -7,73 +7,100 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.io.Serializable;
 
 public class App extends Application {
 
     private int currentRoom = 0;
 
     private final String[] rooms = {
-        "Gallery",
-        "Salon",
-        "Library",
-        "Office",
-        "Deep Work Chamber"
+            "Gallery",
+            "Salon",
+            "Library",
+            "Office",
+            "Deep Work Chamber"
     };
 
     private final String[] descriptions = {
-        "Find inspiration. Explore ideas and discover what is possible.",
-        "Think, discuss and develop your ideas.",
-        "Gather the knowledge and resources you need.",
-        "Organize your work and prepare for execution.",
-        "Eliminate distractions. Give your full attention to meaningful work."
+            "Find inspiration. Explore ideas and discover what is possible.",
+            "Think, discuss and develop your ideas.",
+            "Gather the knowledge and resources you need.",
+            "Organize your work and prepare for execution.",
+            "Eliminate distractions. Give your full attention to meaningful work."
     };
 
     private Label roomTitle;
     private Label roomDescription;
     private Label roomCounter;
+
     private Button continueButton;
 
     private BorderPane layout;
 
+    private GalleryView galleryView;
+    private SalonView salonView;
+    private LibraryView libraryView;
+
     @Override
     public void start(Stage stage) {
 
-        roomTitle = new Label();
-        roomDescription = new Label();
-        roomCounter = new Label();
-
-        continueButton = new Button("Continue");
-        continueButton.setOnAction(event -> nextRoom());
-
         layout = new BorderPane();
-        layout.setPadding(new Insets(35));
+        layout.setStyle("-fx-background-color: #f8f8f6;");
 
-        VBox header = new VBox(10);
-        header.setAlignment(Pos.CENTER_LEFT);
-        header.getChildren().addAll(
-            roomCounter,
-            roomTitle,
-            roomDescription
+        // Header
+        roomTitle = new Label();
+        roomTitle.setStyle(
+                "-fx-font-size: 28px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-text-fill: #292929;"
         );
+
+        roomDescription = new Label();
+        roomDescription.setStyle(
+                "-fx-font-size: 14px;" +
+                "-fx-text-fill: #777777;"
+        );
+
+        roomCounter = new Label();
+        roomCounter.setStyle(
+                "-fx-font-size: 12px;" +
+                "-fx-text-fill: #999999;"
+        );
+
+        VBox header = new VBox(8,
+                roomTitle,
+                roomDescription,
+                roomCounter
+        );
+
+        header.setPadding(new Insets(25, 30, 20, 30));
 
         layout.setTop(header);
 
-        VBox footer = new VBox();
+        // Footer
+        continueButton = new Button();
+
+        styleButton(continueButton);
+
+        continueButton.setOnAction(event -> nextRoom());
+
+        HBox footer = new HBox(continueButton);
         footer.setAlignment(Pos.CENTER_RIGHT);
-        footer.getChildren().add(continueButton);
+        footer.setPadding(new Insets(20, 30, 25, 30));
 
         layout.setBottom(footer);
 
-        Scene scene = new Scene(layout, 900, 600);
+        // Initial room
+        updateRoom();
+
+        Scene scene = new Scene(layout, 1000, 700);
 
         stage.setTitle("Eudaimonia");
         stage.setScene(scene);
-
-        updateRoom();
-
         stage.show();
     }
 
@@ -82,71 +109,82 @@ public class App extends Application {
         if (currentRoom < rooms.length - 1) {
             currentRoom++;
             updateRoom();
+        } else {
+            // Session finished
+            currentRoom = 0;
+            updateRoom();
         }
     }
 
     private void updateRoom() {
 
         roomTitle.setText(rooms[currentRoom]);
-        roomCounter.setText(
-            String.format("%02d / %02d", currentRoom + 1, rooms.length)
-        );
         roomDescription.setText(descriptions[currentRoom]);
 
-        continueButton.setText(
-            currentRoom == rooms.length - 1
-                ? "Finish session"
-                : "Continue"
+        roomCounter.setText(
+                "ROOM " + (currentRoom + 1) + " OF " + rooms.length
         );
 
-        if (currentRoom == 0) {
-            showGallery();
+        switch (currentRoom) {
+
+            case 0:
+                if (galleryView == null) {
+                    galleryView = new GalleryView();
+                }
+
+                layout.setCenter(galleryView);
+                break;
+
+            case 1:
+                if (salonView == null) {
+                    salonView = new SalonView();
+                }
+
+                layout.setCenter(salonView);
+                break;
+
+            case 2:
+                if (libraryView == null) {
+                    libraryView = new LibraryView();
+                }
+
+                layout.setCenter(libraryView);
+                break;
+
+            default:
+                layout.setCenter(new VBox());
+                break;
+        }
+
+        if (currentRoom == rooms.length - 1) {
+            continueButton.setText("Finish session");
         } else {
-            layout.setCenter(createRoomContent());
+            continueButton.setText("Continue");
         }
     }
 
-    private void showGallery() {
+    private void styleButton(Button button) {
 
-        GridPane gallery = new GridPane();
-        gallery.setAlignment(Pos.CENTER);
-        gallery.setHgap(20);
-        gallery.setVgap(20);
-
-        for (int i = 0; i < 3; i++) {
-
-            VBox card = new VBox(10);
-            card.setAlignment(Pos.CENTER);
-            card.setPrefSize(200, 170);
-            card.setStyle(
-                "-fx-background-color: #eeeeee;" +
-                "-fx-background-radius: 8;"
-            );
-
-            Label cardLabel = new Label("Inspiration " + (i + 1));
-            card.getChildren().add(cardLabel);
-
-            gallery.add(card, i, 0);
-        }
-
-        Button addButton = new Button("+ Add inspiration");
-        addButton.setOnAction(event -> {
-            // Adding inspiration will be implemented later.
-        });
-
-        VBox content = new VBox(25);
-        content.setAlignment(Pos.CENTER);
-        content.getChildren().addAll(gallery, addButton);
-
-        layout.setCenter(content);
+        button.setStyle(
+                "-fx-background-color: #292929;" +
+                "-fx-text-fill: white;" +
+                "-fx-background-radius: 6;" +
+                "-fx-padding: 10 22 10 22;" +
+                "-fx-cursor: hand;"
+        );
     }
 
-    private VBox createRoomContent() {
+    static class GalleryItem implements Serializable {
 
-        VBox content = new VBox();
-        content.setAlignment(Pos.CENTER);
+        private static final long serialVersionUID = 1L;
 
-        return content;
+        final String type;
+        final String content;
+
+        GalleryItem(String type, String content) {
+            this.type = type;
+            this.content = content;
+        }
     }
 
     public static void main(String[] args) {
