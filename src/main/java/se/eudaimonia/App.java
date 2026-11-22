@@ -3,11 +3,13 @@ package se.eudaimonia;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -44,64 +46,87 @@ public class App extends Application {
     private GalleryView galleryView;
     private SalonView salonView;
     private LibraryView libraryView;
+    private OfficeView officeView;
+    private DeepWorkView deepWorkView;
 
     @Override
     public void start(Stage stage) {
 
         layout = new BorderPane();
-        layout.setStyle("-fx-background-color: #f8f8f6;");
+        layout.getStyleClass().add("app-root");
 
         // Header
+
         roomTitle = new Label();
-        roomTitle.setStyle(
-                "-fx-font-size: 28px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: #292929;"
-        );
+        roomTitle.getStyleClass().add("heading");
 
         roomDescription = new Label();
-        roomDescription.setStyle(
-                "-fx-font-size: 14px;" +
-                "-fx-text-fill: #777777;"
-        );
+        roomDescription.getStyleClass().add("subtitle");
 
         roomCounter = new Label();
-        roomCounter.setStyle(
-                "-fx-font-size: 12px;" +
-                "-fx-text-fill: #999999;"
-        );
+        roomCounter.getStyleClass().add("secondary-text");
 
-        VBox header = new VBox(8,
+        VBox headerContent = new VBox(
+                7,
                 roomTitle,
                 roomDescription,
                 roomCounter
         );
 
-        header.setPadding(new Insets(25, 30, 20, 30));
+        headerContent.setPadding(new Insets(25, 30, 20, 30));
+        headerContent.setMaxWidth(1100);
+
+        StackPane header = new StackPane(headerContent);
+        header.setAlignment(Pos.CENTER);
 
         layout.setTop(header);
 
         // Footer
-        continueButton = new Button();
 
-        styleButton(continueButton);
+        continueButton = new Button();
+        continueButton.getStyleClass().add("primary-button");
 
         continueButton.setOnAction(event -> nextRoom());
 
-        HBox footer = new HBox(continueButton);
-        footer.setAlignment(Pos.CENTER_RIGHT);
-        footer.setPadding(new Insets(20, 30, 25, 30));
+        HBox footerContent = new HBox(continueButton);
+        footerContent.setAlignment(Pos.CENTER_RIGHT);
+        footerContent.setPadding(new Insets(20, 30, 25, 30));
+        footerContent.setMaxWidth(1100);
+
+        StackPane footer = new StackPane(footerContent);
+        footer.setAlignment(Pos.CENTER);
 
         layout.setBottom(footer);
 
         // Initial room
+
         updateRoom();
 
-        Scene scene = new Scene(layout, 1000, 700);
+        Scene scene = new Scene(layout, 1200, 800);
+
+        // Load global stylesheet
+
+        String css = getClass()
+                .getResource("/se/eudaimonia/style.css")
+                .toExternalForm();
+
+        scene.getStylesheets().add(css);
 
         stage.setTitle("Eudaimonia");
         stage.setScene(scene);
+
+        stage.setMinWidth(900);
+        stage.setMinHeight(650);
+
         stage.show();
+
+        // Start in fullscreen
+
+        stage.setFullScreenExitHint(
+                "Press ESC to leave fullscreen."
+        );
+
+        stage.setFullScreen(true);
     }
 
     private void nextRoom() {
@@ -110,7 +135,6 @@ public class App extends Application {
             currentRoom++;
             updateRoom();
         } else {
-            // Session finished
             currentRoom = 0;
             updateRoom();
         }
@@ -125,6 +149,8 @@ public class App extends Application {
                 "ROOM " + (currentRoom + 1) + " OF " + rooms.length
         );
 
+        Node currentView;
+
         switch (currentRoom) {
 
             case 0:
@@ -132,7 +158,7 @@ public class App extends Application {
                     galleryView = new GalleryView();
                 }
 
-                layout.setCenter(galleryView);
+                currentView = galleryView;
                 break;
 
             case 1:
@@ -140,7 +166,7 @@ public class App extends Application {
                     salonView = new SalonView();
                 }
 
-                layout.setCenter(salonView);
+                currentView = salonView;
                 break;
 
             case 2:
@@ -148,30 +174,41 @@ public class App extends Application {
                     libraryView = new LibraryView();
                 }
 
-                layout.setCenter(libraryView);
+                currentView = libraryView;
+                break;
+
+            case 3:
+                if (officeView == null) {
+                    officeView = new OfficeView();
+                }
+
+                currentView = officeView;
+                break;
+
+            case 4:
+                if (deepWorkView == null) {
+                    deepWorkView = new DeepWorkView();
+                }
+
+                currentView = deepWorkView;
                 break;
 
             default:
-                layout.setCenter(new VBox());
+                currentView = new VBox();
                 break;
         }
+
+
+        StackPane roomContainer = new StackPane(currentView);
+        roomContainer.setAlignment(Pos.TOP_CENTER);
+
+        layout.setCenter(roomContainer);
 
         if (currentRoom == rooms.length - 1) {
             continueButton.setText("Finish session");
         } else {
             continueButton.setText("Continue");
         }
-    }
-
-    private void styleButton(Button button) {
-
-        button.setStyle(
-                "-fx-background-color: #292929;" +
-                "-fx-text-fill: white;" +
-                "-fx-background-radius: 6;" +
-                "-fx-padding: 10 22 10 22;" +
-                "-fx-cursor: hand;"
-        );
     }
 
     static class GalleryItem implements Serializable {

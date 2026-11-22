@@ -26,6 +26,7 @@ public class GalleryView extends BorderPane {
     private GridPane gallery;
 
     public GalleryView() {
+	    getStyleClass().add("room-root");
         try {
             Files.createDirectories(imageFolder);
         } catch (IOException e) {

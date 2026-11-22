@@ -1,0 +1,182 @@
+/* =========================================
+   EUDAIMONIA - GLOBAL DESIGN SYSTEM
+   ========================================= */
+
+.root {
+    -fx-font-family: "Noto Sans", "Arial";
+    -fx-background-color: #F4F4F0;
+}
+
+/* Main application */
+
+.app-root {
+    -fx-background-color: #F4F4F0;
+}
+
+.room-root {
+    -fx-background-color: #F4F4F0;
+}
+
+/* Typography */
+
+.label {
+    -fx-text-fill: #30322E;
+}
+
+.heading {
+    -fx-font-size: 25px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #30322E;
+}
+
+.subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #85877F;
+}
+
+.section-heading {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #30322E;
+}
+
+.secondary-text {
+    -fx-text-fill: #85877F;
+    -fx-font-size: 12px;
+}
+
+/* Cards */
+
+.card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 9px;
+    -fx-border-color: #E5E5DF;
+    -fx-border-radius: 9px;
+    -fx-padding: 20px;
+}
+
+/* Buttons */
+
+.button {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #30322E;
+    -fx-background-radius: 7px;
+    -fx-border-color: #E5E5DF;
+    -fx-border-radius: 7px;
+    -fx-padding: 10px 17px;
+    -fx-cursor: hand;
+    -fx-font-size: 13px;
+}
+
+.button:hover {
+    -fx-background-color: #ECEDE7;
+}
+
+.primary-button {
+    -fx-background-color: #899582;
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: transparent;
+}
+
+.primary-button:hover {
+    -fx-background-color: #788871;
+}
+
+.navigation-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: #85877F;
+}
+
+.navigation-button:hover {
+    -fx-background-color: #EAECE5;
+}
+
+.navigation-button-active {
+    -fx-background-color: #899582;
+    -fx-text-fill: #FFFFFF;
+}
+
+/* Text fields */
+
+.text-field,
+.text-area,
+.combo-box {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E5DF;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-text-fill: #30322E;
+    -fx-prompt-text-fill: #A0A198;
+    -fx-font-size: 13px;
+}
+
+.text-field {
+    -fx-padding: 10px;
+}
+
+.text-area .content {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 6px;
+}
+
+.text-area {
+    -fx-padding: 4px;
+}
+
+/* Lists */
+
+.list-view {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E5DF;
+    -fx-border-radius: 7px;
+    -fx-background-radius: 7px;
+}
+
+.list-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #30322E;
+    -fx-padding: 10px;
+}
+
+.list-cell:filled:selected {
+    -fx-background-color: #E8EBE4;
+    -fx-text-fill: #30322E;
+}
+
+/* Tabs */
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: #F4F4F0;
+}
+
+.tab-pane .tab {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: #FFFFFF;
+}
+
+.tab-pane .tab-label {
+    -fx-text-fill: #30322E;
+}
+
+/* Scrollbars */
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #D4D6CE;
+    -fx-background-radius: 5px;
+}
+
+/* Separators */
+
+.separator .line {
+    -fx-border-color: #E5E5DF;
+}

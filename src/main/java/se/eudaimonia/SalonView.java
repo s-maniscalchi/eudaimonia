@@ -46,7 +46,7 @@ public class SalonView extends BorderPane {
             """;
 
     public SalonView() {
-
+	getStyleClass().add("room-root");
         chatHistory.add(Map.of(
                 "role", "system",
                 "content", SYSTEM_PROMPT

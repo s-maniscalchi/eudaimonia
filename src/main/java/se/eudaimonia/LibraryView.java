@@ -34,7 +34,7 @@ public class LibraryView extends BorderPane {
     private final String textColor = "#292929";
 
     public LibraryView() {
-
+	getStyleClass().add("room-root");
         try {
             Files.createDirectories(fileFolder);
         } catch (IOException e) {
