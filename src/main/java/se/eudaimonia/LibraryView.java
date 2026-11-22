@@ -4,17 +4,17 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
-import java.awt.Desktop;
 import java.io.*;
-import java.net.URI;
 import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 public class LibraryView extends BorderPane {
 
@@ -87,12 +87,10 @@ public class LibraryView extends BorderPane {
 
         setTop(heading);
 
-        // Resources
         resourceGrid = new FlowPane();
         resourceGrid.setHgap(18);
         resourceGrid.setVgap(18);
 
-        // My Work
         workGrid = new FlowPane();
         workGrid.setHgap(18);
         workGrid.setVgap(18);
@@ -155,13 +153,26 @@ public class LibraryView extends BorderPane {
 
         styleButton(addButton, true);
 
-        if (isResource) {
-            addButton.setOnAction(event -> addResource());
-        } else {
-            addButton.setOnAction(event -> addWork());
-        }
+        VBox sectionHeader;
 
-        VBox sectionHeader = new VBox(7, title, subtitle, addButton);
+        if (isResource) {
+
+            addButton.setOnAction(event -> addResource());
+            sectionHeader = new VBox(7, title, subtitle, addButton);
+
+        } else {
+
+            addButton.setOnAction(event -> addWork());
+
+            Button addFolderButton = new Button("+ Add folder");
+            styleButton(addFolderButton, false);
+            addFolderButton.setOnAction(event -> addFolder());
+
+            HBox workActions = new HBox(8, addButton, addFolderButton);
+            workActions.setAlignment(Pos.CENTER_LEFT);
+
+            sectionHeader = new VBox(7, title, subtitle, workActions);
+        }
 
         VBox content = new VBox(22, sectionHeader, grid);
         content.setPadding(new Insets(25, 30, 30, 30));
@@ -526,6 +537,43 @@ public class LibraryView extends BorderPane {
     }
 
     // --------------------------------------------------
+    // Add a whole folder to My Work
+    // --------------------------------------------------
+
+    private void addFolder() {
+
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Choose a folder to add to My Work");
+
+        File selectedFolder = chooser.showDialog(getScene().getWindow());
+
+        if (selectedFolder == null) {
+            return;
+        }
+
+        Path source = selectedFolder.toPath();
+
+        String savedLocation = copyWorkFolder(source);
+
+        if (savedLocation.isBlank()) {
+            return;
+        }
+
+        LibraryItem item = new LibraryItem(
+                "work",
+                source.getFileName().toString(),
+                "Folder",
+                "Imported folder and its contents.",
+                savedLocation,
+                currentDate()
+        );
+
+        items.add(item);
+        saveLibrary();
+        refreshLibrary();
+    }
+
+    // --------------------------------------------------
     // File handling
     // --------------------------------------------------
 
@@ -563,34 +611,101 @@ public class LibraryView extends BorderPane {
         }
     }
 
+    private String copyWorkFolder(Path source) {
+
+        Path normalizedSource = source.toAbsolutePath().normalize();
+        Path normalizedLibraryFolder = fileFolder.toAbsolutePath().normalize();
+
+        if (normalizedSource.startsWith(normalizedLibraryFolder)
+                || normalizedLibraryFolder.startsWith(normalizedSource)) {
+            showError("Choose a folder outside Eudaimonia's Library storage.");
+            return "";
+        }
+
+        if (!Files.isDirectory(normalizedSource)) {
+            showError("The selected folder could not be found.");
+            return "";
+        }
+
+        Path destination = fileFolder.resolve(
+                UUID.randomUUID() + "_" + normalizedSource.getFileName()
+        );
+
+        try (var paths = Files.walk(normalizedSource)) {
+
+            for (Path path : (Iterable<Path>) paths::iterator) {
+
+                Path relativePath = normalizedSource.relativize(path);
+                Path target = destination.resolve(relativePath);
+
+                if (Files.isDirectory(path)) {
+                    Files.createDirectories(target);
+                } else {
+                    Files.createDirectories(target.getParent());
+                    Files.copy(path, target, StandardCopyOption.COPY_ATTRIBUTES);
+                }
+            }
+
+            return destination.toString();
+
+        } catch (IOException e) {
+            deleteFolderQuietly(destination);
+            showError("Could not copy the selected folder.");
+            return "";
+        }
+    }
+
+    private void deleteFolderQuietly(Path folder) {
+
+        if (!Files.exists(folder)) {
+            return;
+        }
+
+        try (var paths = Files.walk(folder)) {
+
+            paths.sorted((first, second) -> second.compareTo(first))
+                    .forEach(path -> {
+                        try {
+                            Files.deleteIfExists(path);
+                        } catch (IOException ignored) {
+                            // Best-effort cleanup after an incomplete copy.
+                        }
+                    });
+
+        } catch (IOException ignored) {
+            // Best-effort cleanup.
+        }
+    }
+
+    // --------------------------------------------------
+    // Open files, folders and links
+    // --------------------------------------------------
+
     private void openItem(LibraryItem item) {
 
         try {
 
-            if (!Desktop.isDesktopSupported()) {
-                showError("Opening files is not supported on this system.");
+            String location = item.location;
+
+            if (location.startsWith("http://")
+                    || location.startsWith("https://")) {
+
+                new ProcessBuilder("xdg-open", location).start();
                 return;
             }
 
-            Desktop desktop = Desktop.getDesktop();
+            Path path = Paths.get(location);
 
-            if (item.location.startsWith("http://")
-                    || item.location.startsWith("https://")) {
+            if (Files.exists(path)) {
 
-                desktop.browse(URI.create(item.location));
+                new ProcessBuilder("xdg-open", path.toString()).start();
 
             } else {
 
-                Path path = Paths.get(item.location);
-
-                if (Files.exists(path)) {
-                    desktop.open(path.toFile());
-                } else {
-                    showError("The saved file could not be found.");
-                }
+                showError("The saved file or folder could not be found.");
             }
 
-        } catch (Exception e) {
+        } catch (IOException | InvalidPathException e) {
             showError("Could not open this resource.");
         }
     }
