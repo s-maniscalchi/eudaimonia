@@ -16,4 +16,4 @@ It is simple an app that is five rooms. Gallery, Salon, Library, Office, Deep Wo
 
 A represented picture:
 <img width="1446" height="549" alt="image" src="https://github.com/user-attachments/assets/3b7df04b-7e38-457f-b54b-9d94ffe40eed" />
-
+*picture from https://blog.fentress.com/blog/the-eudaimonia-machine-a-space-concept-for-the-21st-century*
