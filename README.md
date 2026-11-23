@@ -13,3 +13,7 @@ It is simple an app that is five rooms. Gallery, Salon, Library, Office, Deep Wo
 |gallery|Salon|Library|Office|Deep Work Chamber|
 |-------------------------|-------------------------|-------------------------|-------------------------|-------------------------|
 |here you find inspiration|Here you can discuss ideas with other|Here you gather information and collect it|Here you pick out the things you need for work and plan sessions|Here you work with no distractions for long period of time (90 min)|
+
+A represented picture:
+<img width="1446" height="549" alt="image" src="https://github.com/user-attachments/assets/3b7df04b-7e38-457f-b54b-9d94ffe40eed" />
+
