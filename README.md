@@ -11,4 +11,5 @@ Eudaimonia aims to provide a simple minimalistic environment for focused academi
 It is simple an app that is five rooms. Gallery, Salon, Library, Office, Deep Work Chamber. You cannot enter another room by going through the ones before. The order is the same as i wrote. Here is the definition of each room:
 
 |gallery|Salon|Library|Office|Deep Work Chamber|
-|here you find inspiration|
+|-------------------------|-------------------------|-------------------------|-------------------------|-------------------------|
+|here you find inspiration|Here you can discuss ideas with other|Here you gather information and collect it|Here you pick out the things you need for work and plan sessions|Here you work with no distractions for long period of time (90 min)|
